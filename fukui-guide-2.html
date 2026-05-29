@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUKUI GUIDE - 福井県おでかけナビ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Hiragino Sans", "Noto Sans JP", sans-serif; background: linear-gradient(160deg,#f1f8e9,#e8f5e9,#e0f7fa); min-height: 100vh; }
+header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:rgba(255,255,255,.9); border-bottom:2px solid #c8e6c9; position:sticky; top:0; z-index:10; }
+.logo-title { font-weight:900; font-size:17px; color:#1b5e20; }
+.logo-sub { font-size:11px; color:#558b2f; }
+main { flex:1; padding:16px; display:flex; flex-direction:column; gap:18px; max-width:680px; width:100%; margin:0 auto; }
+.greeting { display:flex; gap:10px; align-items:flex-start; animation:fadeIn .4s ease; }
+.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#a5d6a7,#80cbc4); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.bubble { background:#fff; border:1.5px solid #c8e6c9; border-radius:4px 16px 16px 16px; padding:12px 16px; line-height:1.8; font-size:14px; color:#1a2e1a; }
+.section { background:rgba(255,255,255,.85); border-radius:16px; padding:16px; border:1.5px solid #c8e6c9; margin-bottom:0; }
+.section-label { font-size:13px; font-weight:700; color:#388e3c; margin-bottom:12px; }
+.mood-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+.mood-btn { background:#fff; border:1.5px solid #c8e6c9; border-radius:12px; padding:8px 4px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; transition:all .2s; }
+.mood-btn:hover { background:#e8f5e9; transform:translateY(-2px); }
+.mood-emoji { font-size:20px; }
+.mood-text { font-size:10px; color:#2e7d32; font-weight:700; text-align:center; line-height:1.3; }
+.area-grid { display:flex; flex-wrap:wrap; gap:6px; }
+.area-btn { background:#fff; border:1.5px solid #a5d6a7; border-radius:20px; padding:6px 14px; font-size:12px; font-weight:700; color:#1b5e20; cursor:pointer; transition:background .2s; }
+.area-btn:hover { background:#e8f5e9; }
+.search-row { display:flex; gap:8px; }
+.search-input { flex:1; border:1.5px solid #c8e6c9; border-radius:10px; padding:10px 14px; font-size:14px; outline:none; font-family:inherit; }
+.search-btn { background:linear-gradient(135deg,#2e7d32,#00695c); color:#fff; border:none; border-radius:10px; padding:10px 18px; font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; }
+.tag-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.tag { background:#e8f5e9; border:1px solid #a5d6a7; border-radius:20px; padding:4px 12px; font-size:12px; color:#2e7d32; cursor:pointer; font-weight:600; font-family:inherit; }
+.result-header { display:flex; align-items:center; gap:12px; }
+.back-btn { background:none; border:1.5px solid #c8e6c9; border-radius:10px; padding:6px 14px; font-size:13px; cursor:pointer; color:#2e7d32; font-weight:700; font-family:inherit; }
+.result-title { font-size:15px; font-weight:700; color:#1b5e20; }
+.result-count { font-size:13px; color:#558b2f; font-weight:600; }
+.card-list { display:flex; flex-direction:column; gap:12px; }
+.card { background:#fff; border:1.5px solid #c8e6c9; border-radius:16px; padding:16px; animation:fadeIn .3s ease; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+.card-top { display:flex; gap:12px; align-items:flex-start; margin-bottom:8px; }
+.card-emoji { font-size:28px; line-height:1; }
+.card-name { font-weight:800; font-size:15px; color:#1b5e20; }
+.card-meta { font-size:12px; color:#666; margin-top:2px; }
+.cat-badge { background:#e8f5e9; border-radius:10px; padding:1px 8px; color:#388e3c; font-weight:700; font-size:11px; }
+.card-desc { font-size:13px; color:#333; line-height:1.7; margin-bottom:8px; }
+.access-box { display:flex; align-items:flex-start; gap:6px; background:#f5f5f5; border-radius:8px; padding:7px 10px; margin-bottom:10px; font-size:12px; color:#555; line-height:1.6; }
+.info-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.info-badge { background:#f5f5f5; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; color:#555; }
+.badge-smoke { background:#fff3e0; color:#e65100; }
+.badge-bunnen { background:#e8f5e9; color:#2e7d32; }
+.card-bottom { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:8px; }
+.card-tags { display:flex; flex-wrap:wrap; gap:5px; }
+.card-tag { background:#e8f5e9; border-radius:20px; padding:2px 10px; font-size:11px; color:#388e3c; font-weight:600; }
+.btn-row { display:flex; gap:6px; flex-shrink:0; }
+.map-btn { background:#1565c0; color:#fff; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; text-decoration:none; display:inline-block; }
+.site-btn { background:linear-gradient(135deg,#2e7d32,#00695c); color:#fff; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; text-decoration:none; display:inline-block; }
+.smoking-row { display:flex; gap:6px; flex-wrap:wrap; }
+.smoking-btn { background:#fff; border:1.5px solid #c8e6c9; border-radius:20px; padding:6px 14px; font-size:12px; font-weight:700; color:#555; cursor:pointer; font-family:inherit; }
+.smoking-btn.active { background:linear-gradient(135deg,#2e7d32,#00695c); color:#fff; border-color:#2e7d32; }
+.no-result { display:flex; flex-direction:column; align-items:center; gap:16px; padding:40px; text-align:center; font-size:14px; line-height:1.8; color:#555; }
+/* チェーン店 */
+.chain-total { font-size:11px; color:#888; margin-bottom:12px; }
+.chain-label { font-size:11px; font-weight:700; color:#388e3c; margin-bottom:6px; }
+.chain-row { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; }
+.chain-btn { background:#fff; border:1.5px solid #c8e6c9; border-radius:20px; padding:4px 10px; font-size:11px; font-weight:600; color:#555; cursor:pointer; font-family:inherit; }
+.chain-btn.active { background:linear-gradient(135deg,#2e7d32,#00695c); color:#fff; border-color:#2e7d32; }
+.chain-count { font-size:12px; color:#558b2f; font-weight:700; margin-bottom:8px; }
+.chain-grid { display:flex; flex-direction:column; gap:6px; }
+.chain-card { display:flex; align-items:center; gap:8px; background:#fff; border:1.5px solid #e0e0e0; border-radius:10px; padding:8px 12px; text-decoration:none; color:#1a2e1a; }
+.chain-name { font-size:12px; font-weight:700; color:#1b5e20; }
+.chain-addr { font-size:11px; color:#888; margin-top:1px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.chain-note { font-size:11px; color:#aaa; margin-top:10px; text-align:center; }
+/* マスコット */
+.mascot-wrap { position:fixed; bottom:20px; right:16px; z-index:1000; display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.mascot-btn { background:none; border:none; cursor:pointer; padding:0; filter:drop-shadow(0 3px 8px rgba(0,0,0,.2)); }
+.mascot-balloon { background:#fff; border:2px solid #6dd36d; border-radius:14px 14px 4px 14px; padding:8px 12px; font-size:12px; font-weight:700; color:#1b5e20; line-height:1.6; box-shadow:0 3px 12px rgba(0,0,0,.12); max-width:160px; text-align:center; }
+.hidden { display:none; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.mascot-btn { animation:float 3s ease-in-out infinite; }
+#page-top { display:flex; flex-direction:column; gap:18px; }
+#page-results { display:none; flex-direction:column; gap:18px; }
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:28px">🦕</span>
+  <div>
+    <div class="logo-title">FUKUI GUIDE</div>
+    <div class="logo-sub">福井県おでかけナビ</div>
+  </div>
+</header>
+<main>
+  <!-- トップページ -->
+  <div id="page-top">
+    <div class="greeting">
+      <div class="avatar">🦕</div>
+      <div class="bubble">こんにちは！今日はどんな気分？<br>気分・エリア・キーワードで探してみてね！</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">☀️ 気分で探す</div>
+      <div class="mood-grid" id="mood-grid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">📍 エリアで探す</div>
+      <div class="area-grid" id="area-grid"></div>
+    </div>
+
+    <div class="section" id="chain-section">
+      <div class="section-label">🏪 チェーン店を探す</div>
+      <div class="chain-total" id="chain-total"></div>
+      <div class="chain-label">エリア</div>
+      <div class="chain-row" id="chain-area-row"></div>
+      <div class="chain-label">カテゴリ</div>
+      <div class="chain-row" id="chain-cat-row"></div>
+      <div class="chain-count" id="chain-count"></div>
+      <div class="chain-grid" id="chain-grid"></div>
+      <div class="chain-note">タップするとGoogleマップで開きます</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">🔍 キーワードで探す</div>
+      <div class="search-row">
+        <input class="search-input" id="search-input" placeholder="例：三国 カフェ、あわら 旅館、桜…" onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="search-btn" onclick="doSearch()">検索</button>
+      </div>
+      <div class="tag-row" id="tag-row"></div>
+    </div>
+  </div>
+
+  <!-- 結果ページ -->
+  <div id="page-results">
+    <div class="result-header">
+      <button class="back-btn" onclick="goBack()">← 戻る</button>
+      <div class="result-title" id="result-title"></div>
+    </div>
+    <div class="smoking-row" id="smoking-row"></div>
+    <div class="result-count" id="result-count"></div>
+    <div class="card-list" id="card-list"></div>
+    <div style="text-align:center;margin-top:8px">
+      <button class="search-btn" onclick="goBack()">もう一度探す</button>
+    </div>
+  </div>
+</main>
+
+<!-- マスコット -->
+<div class="mascot-wrap">
+  <div class="mascot-balloon hidden" id="mascot-balloon">やあ！ぼく<br>ふくいザウルスだよ！</div>
+  <button class="mascot-btn" onclick="toggleMascot()">
+    <svg width="56" height="64" viewBox="0 0 280 320" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="228" cy="230" rx="48" ry="18" fill="#5cb85c" transform="rotate(-30 228 230)"/>
+      <ellipse cx="248" cy="210" rx="32" ry="12" fill="#4cae4c" transform="rotate(-40 248 210)"/>
+      <ellipse cx="140" cy="210" rx="72" ry="85" fill="#6dd36d"/>
+      <ellipse cx="140" cy="220" rx="44" ry="58" fill="#c8f5c8"/>
+      <ellipse cx="72" cy="185" rx="18" ry="32" fill="#6dd36d" transform="rotate(25 72 185)"/>
+      <ellipse cx="208" cy="185" rx="18" ry="32" fill="#6dd36d" transform="rotate(-25 208 185)"/>
+      <ellipse cx="108" cy="285" rx="22" ry="14" fill="#5cb85c"/>
+      <ellipse cx="172" cy="285" rx="22" ry="14" fill="#5cb85c"/>
+      <ellipse cx="140" cy="138" rx="38" ry="30" fill="#6dd36d"/>
+      <ellipse cx="140" cy="100" rx="58" ry="52" fill="#6dd36d"/>
+      <ellipse cx="100" cy="58" rx="12" ry="18" fill="#5cb85c" transform="rotate(-15 100 58)"/>
+      <ellipse cx="180" cy="58" rx="12" ry="18" fill="#5cb85c" transform="rotate(15 180 58)"/>
+      <ellipse cx="100" cy="58" rx="7" ry="11" fill="#ff9999" transform="rotate(-15 100 58)"/>
+      <ellipse cx="180" cy="58" rx="7" ry="11" fill="#ff9999" transform="rotate(15 180 58)"/>
+      <circle cx="118" cy="93" r="18" fill="white"/>
+      <circle cx="162" cy="93" r="18" fill="white"/>
+      <circle cx="121" cy="96" r="11" fill="#333"/>
+      <circle cx="165" cy="96" r="11" fill="#333"/>
+      <circle cx="125" cy="91" r="4" fill="white"/>
+      <circle cx="169" cy="91" r="4" fill="white"/>
+      <ellipse cx="102" cy="115" rx="13" ry="9" fill="#ff9999" opacity="0.6"/>
+      <ellipse cx="178" cy="115" rx="13" ry="9" fill="#ff9999" opacity="0.6"/>
+      <path d="M 120 122 Q 140 138 160 122" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="140" cy="52" rx="52" ry="10" fill="#d4a843"/>
+      <ellipse cx="140" cy="48" rx="38" ry="8" fill="#e8c060"/>
+      <path d="M 102 48 Q 140 22 178 48" fill="#d4a843"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+const CHAINS = [
+  // ===== マクドナルド =====
+  { name: "マクドナルド 福井駅店", emoji: "🍔", cat: "ファストフード", area: "福井市", addr: "福井市中央1-1-25 くるふ福井駅内", url: "https://map.mcdonalds.co.jp/map/18526" },
+  { name: "マクドナルド 8号線福井店", emoji: "🍔", cat: "ファストフード", area: "福井市", addr: "福井市大島町1字北蔵207", url: "https://map.mcdonalds.co.jp" },
+  { name: "マクドナルド 福井若杉店", emoji: "🍔", cat: "ファストフード", area: "福井市", addr: "福井市若杉4-710", url: "https://map.mcdonalds.co.jp" },
+  { name: "マクドナルド 福井MEGAドン・キホーテUNY店", emoji: "🍔", cat: "ファストフード", area: "福井市", addr: "福井市西木田2-8-1", url: "https://map.mcdonalds.co.jp" },
+  { name: "マクドナルド 三国バイパス店", emoji: "🍔", cat: "ファストフード", area: "坂井市", addr: "坂井市三国町楽円53字下沖田1-1", url: "https://map.mcdonalds.co.jp" },
+  { name: "マクドナルド 敦賀店", emoji: "🍔", cat: "ファストフード", area: "敦賀市", addr: "敦賀市古田刈28-1-1", url: "https://map.mcdonalds.co.jp" },
+  { name: "マクドナルド 武生シピィ店", emoji: "🍔", cat: "ファストフード", area: "越前市", addr: "越前市四郎丸町255", url: "https://map.mcdonalds.co.jp" },
+
+  // ===== スシロー =====
+  { name: "スシロー 福井若杉店", emoji: "🍣", cat: "回転寿司", area: "福井市", addr: "福井市若杉1-3015", url: "https://www.akindo-sushiro.co.jp/shop/detail.php?id=289" },
+  { name: "スシロー 福井米松店", emoji: "🍣", cat: "回転寿司", area: "福井市", addr: "福井市米松1-16-38", url: "https://www.akindo-sushiro.co.jp/shop/detail.php?id=344" },
+  { name: "スシロー 春江店", emoji: "🍣", cat: "回転寿司", area: "坂井市", addr: "坂井市春江町随応寺24-6-3", url: "https://www.akindo-sushiro.co.jp/shop/detail.php?id=443" },
+  { name: "スシロー 鯖江店", emoji: "🍣", cat: "回転寿司", area: "鯖江市", addr: "鯖江市桜町3-13-12", url: "https://www.akindo-sushiro.co.jp/shop/detail.php?id=1853" },
+
+  // ===== くら寿司 =====
+  { name: "無添くら寿司 福井幾久店", emoji: "🍣", cat: "回転寿司", area: "福井市", addr: "福井市幾久町309", url: "https://shop.kurasushi.co.jp/" },
+  { name: "無添くら寿司 武生店", emoji: "🍣", cat: "回転寿司", area: "越前市", addr: "越前市高瀬2丁目", url: "https://shop.kurasushi.co.jp/" },
+
+  // ===== はま寿司 =====
+  { name: "はま寿司 福井羽水店", emoji: "🍣", cat: "回転寿司", area: "福井市", addr: "福井市羽水2丁目", url: "https://maps.hama-sushi.co.jp/jp/detail/4177.html" },
+  { name: "はま寿司 春江店", emoji: "🍣", cat: "回転寿司", area: "坂井市", addr: "坂井市春江町", url: "https://maps.hama-sushi.co.jp" },
+  { name: "はま寿司 武生店", emoji: "🍣", cat: "回転寿司", area: "越前市", addr: "越前市武生", url: "https://maps.hama-sushi.co.jp" },
+
+  // ===== すき家 =====
+  { name: "すき家 416号福井開発店", emoji: "🍚", cat: "牛丼・丼", area: "福井市", addr: "福井市開発4-309", url: "https://maps.sukiya.jp/jp/detail/536.html" },
+  { name: "すき家 福井日光店", emoji: "🍚", cat: "牛丼・丼", area: "福井市", addr: "福井市日光2-27-13", url: "https://maps.sukiya.jp/jp/detail/1298.html" },
+  { name: "すき家 福井和田店", emoji: "🍚", cat: "牛丼・丼", area: "福井市", addr: "福井市和田2-110", url: "https://maps.sukiya.jp/jp/detail/5465.html" },
+  { name: "すき家 福井大島店", emoji: "🍚", cat: "牛丼・丼", area: "福井市", addr: "福井市大島町1字北蔵207", url: "https://maps.sukiya.jp" },
+  { name: "すき家 福井御幸店", emoji: "🍚", cat: "牛丼・丼", area: "福井市", addr: "福井市御幸", url: "https://maps.sukiya.jp/jp/detail/637.html" },
+  { name: "すき家 福井春江店", emoji: "🍚", cat: "牛丼・丼", area: "坂井市", addr: "坂井市春江町江留下宇和江48", url: "https://maps.sukiya.jp" },
+  { name: "すき家 8号坂井丸岡店", emoji: "🍚", cat: "牛丼・丼", area: "坂井市", addr: "坂井市丸岡町朝陽2-102-1", url: "https://maps.sukiya.jp" },
+  { name: "すき家 越前押田店", emoji: "🍚", cat: "牛丼・丼", area: "越前市", addr: "越前市押田2-1-1", url: "https://maps.sukiya.jp" },
+  { name: "すき家 敦賀木崎店", emoji: "🍚", cat: "牛丼・丼", area: "敦賀市", addr: "敦賀市木崎19-14-1", url: "https://maps.sukiya.jp" },
+  { name: "すき家 27号小浜店", emoji: "🍚", cat: "牛丼・丼", area: "小浜市", addr: "小浜市遠敷24-26-1", url: "https://maps.sukiya.jp" },
+
+  // ===== スターバックス =====
+  { name: "スターバックス くるふ福井駅店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市中央1-1-25 くるふ福井駅", url: "https://store.starbucks.co.jp/detail-4393/" },
+  { name: "スターバックス そよら福井開発店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市開発 そよら福井開発", url: "https://store.starbucks.co.jp/detail-4483/" },
+  { name: "スターバックス 福井二の宮 藤島通り店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市二の宮3-2-11", url: "https://store.starbucks.co.jp" },
+  { name: "スターバックス フェアモール福井店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市大和田2-1230 フェアモール福井", url: "https://store.starbucks.co.jp" },
+  { name: "スターバックス 福井西環状 やしろ店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市渕2-1717", url: "https://store.starbucks.co.jp" },
+  { name: "スターバックス 福井花堂店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市花堂", url: "https://store.starbucks.co.jp" },
+  { name: "スターバックス 福井県済生会病院店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市和田中町舟橋7-1 福井県済生会病院", url: "https://store.starbucks.co.jp" },
+  { name: "スターバックス 福井春江店", emoji: "☕", cat: "カフェチェーン", area: "坂井市", addr: "坂井市春江町", url: "https://store.starbucks.co.jp" },
+  { name: "スターバックス 敦賀駅前店", emoji: "☕", cat: "カフェチェーン", area: "敦賀市", addr: "敦賀市駅前", url: "https://store.starbucks.co.jp" },
+  { name: "スターバックス 武生中央公園店", emoji: "☕", cat: "カフェチェーン", area: "越前市", addr: "越前市武生中央公園", url: "https://store.starbucks.co.jp" },
+  { name: "スターバックス 南条サービスエリア（上り線）店", emoji: "☕", cat: "カフェチェーン", area: "南越前町", addr: "南条郡南越前町 北陸道南条SA上り", url: "https://store.starbucks.co.jp" },
+
+  // ===== コメダ珈琲 =====
+  { name: "コメダ珈琲店 福井木田橋通り店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市木田町1805番", url: "https://www.komeda.co.jp" },
+  { name: "コメダ珈琲店 福井二の宮店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市二の宮2丁目803番1", url: "https://www.komeda.co.jp" },
+  { name: "コメダ珈琲店 敦賀店", emoji: "☕", cat: "カフェチェーン", area: "敦賀市", addr: "敦賀市呉竹町2丁目5番15号", url: "https://www.komeda.co.jp" },
+  { name: "コメダ珈琲店 越前店", emoji: "☕", cat: "カフェチェーン", area: "越前市", addr: "越前市", url: "https://www.komeda.co.jp" },
+  { name: "コメダ珈琲店 鯖江店", emoji: "☕", cat: "カフェチェーン", area: "鯖江市", addr: "鯖江市神明町3丁目10-20", url: "https://www.komeda.co.jp" },
+  { name: "コメダ珈琲店 大野インター店", emoji: "☕", cat: "カフェチェーン", area: "大野市", addr: "大野市中保9-14-1", url: "https://www.komeda.co.jp" },
+  { name: "コメダ珈琲店 小浜店", emoji: "☕", cat: "カフェチェーン", area: "小浜市", addr: "小浜市駅前町13-11", url: "https://www.komeda.co.jp" },
+
+  // ===== ガスト =====
+  { name: "ガスト 福井西店", emoji: "🍽️", cat: "ファミレス", area: "福井市", addr: "福井市西方1丁目", url: "https://www.skylark.co.jp/gusto/" },
+  { name: "ガスト 福井開発店", emoji: "🍽️", cat: "ファミレス", area: "福井市", addr: "福井市開発", url: "https://www.skylark.co.jp/gusto/" },
+  { name: "ガスト 春江店", emoji: "🍽️", cat: "ファミレス", area: "坂井市", addr: "坂井市春江町", url: "https://www.skylark.co.jp/gusto/" },
+  { name: "ガスト 武生店", emoji: "🍽️", cat: "ファミレス", area: "越前市", addr: "越前市武生", url: "https://www.skylark.co.jp/gusto/" },
+  { name: "ガスト 敦賀店", emoji: "🍽️", cat: "ファミレス", area: "敦賀市", addr: "敦賀市", url: "https://www.skylark.co.jp/gusto/" },
+
+  // ===== サイゼリヤ =====
+  { name: "サイゼリヤ アピタ福井大和田店", emoji: "🍝", cat: "ファミレス", area: "福井市", addr: "福井市大和田2丁目", url: "https://www.saizeriya.co.jp" },
+  { name: "サイゼリヤ フェアモール福井店", emoji: "🍝", cat: "ファミレス", area: "福井市", addr: "福井市大和田2-1230 フェアモール福井", url: "https://www.saizeriya.co.jp" },
+  { name: "サイゼリヤ 武生シピィ店", emoji: "🍝", cat: "ファミレス", area: "越前市", addr: "越前市四郎丸町255", url: "https://www.saizeriya.co.jp" },
+  { name: "サイゼリヤ 敦賀店", emoji: "🍝", cat: "ファミレス", area: "敦賀市", addr: "敦賀市", url: "https://www.saizeriya.co.jp" },
+
+  // ===== 幸楽苑 =====
+  { name: "幸楽苑 福井大和田店", emoji: "🍜", cat: "ラーメンチェーン", area: "福井市", addr: "福井市大和田", url: "https://www.kourakuen.co.jp" },
+  { name: "幸楽苑 福井開発店", emoji: "🍜", cat: "ラーメンチェーン", area: "福井市", addr: "福井市開発", url: "https://www.kourakuen.co.jp" },
+  { name: "幸楽苑 坂井店", emoji: "🍜", cat: "ラーメンチェーン", area: "坂井市", addr: "坂井市坂井町", url: "https://www.kourakuen.co.jp" },
+  { name: "幸楽苑 武生インター店", emoji: "🍜", cat: "ラーメンチェーン", area: "越前市", addr: "越前市武生インター付近", url: "https://www.kourakuen.co.jp" },
+  { name: "幸楽苑 敦賀店", emoji: "🍜", cat: "ラーメンチェーン", area: "敦賀市", addr: "敦賀市", url: "https://www.kourakuen.co.jp" },
+  { name: "幸楽苑 鯖江店", emoji: "🍜", cat: "ラーメンチェーン", area: "鯖江市", addr: "鯖江市", url: "https://www.kourakuen.co.jp" },
+
+  // ===== 丸源ラーメン =====
+  { name: "丸源ラーメン 福井若杉店", emoji: "🍜", cat: "ラーメンチェーン", area: "福井市", addr: "福井市若杉1丁目2901", url: "https://www.syodai-marugen.jp/shop/29" },
+  { name: "丸源ラーメン 敦賀店", emoji: "🍜", cat: "ラーメンチェーン", area: "敦賀市", addr: "敦賀市", url: "https://www.syodai-marugen.jp" },
+  { name: "丸源ラーメン 武生店", emoji: "🍜", cat: "ラーメンチェーン", area: "越前市", addr: "越前市武生", url: "https://www.syodai-marugen.jp" },
+
+  // ===== 焼肉きんぐ =====
+  { name: "焼肉きんぐ 福井開発店", emoji: "🥩", cat: "焼肉", area: "福井市", addr: "福井市開発", url: "https://www.yakiniku-king.jp" },
+  { name: "焼肉きんぐ 春江店", emoji: "🥩", cat: "焼肉", area: "坂井市", addr: "坂井市春江町", url: "https://www.yakiniku-king.jp" },
+  { name: "焼肉きんぐ 武生店", emoji: "🥩", cat: "焼肉", area: "越前市", addr: "越前市武生", url: "https://www.yakiniku-king.jp" },
+  { name: "焼肉きんぐ 敦賀店", emoji: "🥩", cat: "焼肉", area: "敦賀市", addr: "敦賀市", url: "https://www.yakiniku-king.jp" },
+
+  // ===== その他チェーン =====
+  { name: "ケンタッキーフライドチキン 福井開発店", emoji: "🍗", cat: "ファストフード", area: "福井市", addr: "福井市開発", url: "https://www.kfc.co.jp" },
+  { name: "ケンタッキーフライドチキン 敦賀店", emoji: "🍗", cat: "ファストフード", area: "敦賀市", addr: "敦賀市", url: "https://www.kfc.co.jp" },
+  { name: "モスバーガー 福井開発店", emoji: "🍔", cat: "ファストフード", area: "福井市", addr: "福井市開発", url: "https://www.mos.co.jp" },
+  { name: "モスバーガー 敦賀店", emoji: "🍔", cat: "ファストフード", area: "敦賀市", addr: "敦賀市", url: "https://www.mos.co.jp" },
+  { name: "吉野家 福井大和田店", emoji: "🍚", cat: "牛丼・丼", area: "福井市", addr: "福井市大和田", url: "https://www.yoshinoya.com" },
+  { name: "吉野家 敦賀店", emoji: "🍚", cat: "牛丼・丼", area: "敦賀市", addr: "敦賀市", url: "https://www.yoshinoya.com" },
+  { name: "なか卯 福井店", emoji: "🍚", cat: "牛丼・丼", area: "福井市", addr: "福井市", url: "https://www.nakau.co.jp" },
+  { name: "びっくりドンキー 福井店", emoji: "🍔", cat: "ファミレス", area: "福井市", addr: "福井市", url: "https://www.bikkuri-donkey.com" },
+  { name: "びっくりドンキー 武生店", emoji: "🍔", cat: "ファミレス", area: "越前市", addr: "越前市武生", url: "https://www.bikkuri-donkey.com" },
+  { name: "しゃぶ葉 福井店", emoji: "🍲", cat: "焼肉", area: "福井市", addr: "福井市", url: "https://www.skylark.co.jp/shabuyo/" },
+  { name: "しゃぶ葉 敦賀店", emoji: "🍲", cat: "焼肉", area: "敦賀市", addr: "敦賀市", url: "https://www.skylark.co.jp/shabuyo/" },
+  { name: "かっぱ寿司 福井店", emoji: "🍣", cat: "回転寿司", area: "福井市", addr: "福井市", url: "https://www.kappasushi.jp" },
+  { name: "かっぱ寿司 敦賀店", emoji: "🍣", cat: "回転寿司", area: "敦賀市", addr: "敦賀市", url: "https://www.kappasushi.jp" },
+  { name: "ミスタードーナツ フェアモール福井店", emoji: "🍩", cat: "ファストフード", area: "福井市", addr: "福井市大和田2-1230 フェアモール福井", url: "https://www.misterdonut.jp" },
+  { name: "ミスタードーナツ 武生シピィ店", emoji: "🍩", cat: "ファストフード", area: "越前市", addr: "越前市四郎丸町255", url: "https://www.misterdonut.jp" },
+  { name: "タリーズコーヒー アピタ福井大和田店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市大和田2丁目", url: "https://www.tullys.co.jp" },
+  { name: "ドトールコーヒー 福井店", emoji: "☕", cat: "カフェチェーン", area: "福井市", addr: "福井市", url: "https://www.doutor.co.jp" },
+  { name: "シャトレーゼ 福井大和田店", emoji: "🍰", cat: "スイーツ", area: "福井市", addr: "福井市大和田", url: "https://www.chateraise.co.jp" },
+  { name: "シャトレーゼ 福井春江店", emoji: "🍰", cat: "スイーツ", area: "坂井市", addr: "坂井市春江町", url: "https://www.chateraise.co.jp" },
+  { name: "シャトレーゼ 鯖江店", emoji: "🍰", cat: "スイーツ", area: "鯖江市", addr: "鯖江市", url: "https://www.chateraise.co.jp" },
+  { name: "シャトレーゼ 敦賀店", emoji: "🍰", cat: "スイーツ", area: "敦賀市", addr: "敦賀市", url: "https://www.chateraise.co.jp" },
+  { name: "シャトレーゼ 勝山店", emoji: "🍰", cat: "スイーツ", area: "勝山市", addr: "勝山市", url: "https://www.chateraise.co.jp" },
+  { name: "サーティワンアイスクリーム フェアモール福井店", emoji: "🍦", cat: "スイーツ", area: "福井市", addr: "福井市大和田2-1230", url: "https://www.31ice.co.jp" },
+  { name: "サーティワンアイスクリーム 武生シピィ店", emoji: "🍦", cat: "スイーツ", area: "越前市", addr: "越前市四郎丸町255", url: "https://www.31ice.co.jp" },
+];
+
+
+const SPOTS = [
+  // ===== 坂井市・三国エリア =====
+  { name: "東尋坊（とうじんぼう）", area: "坂井市", cat: "自然", tags: ["絶景","海","断崖","三国","ドライブ","インスタ","カップル","一人","夕日"], desc: "日本海を一望できる高さ25mの断崖絶壁。国の天然記念物。夕日スポットとしても有名！", emoji: "🌊", access: "えちぜん鉄道三国港駅から京福バス東尋坊方面行き約9分「東尋坊」下車すぐ／北陸道丸岡ICから車で約15km", url: "https://www.fuku-e.com/spot/detail_1476.html" },
+  { name: "雄島（おしま）", area: "坂井市", cat: "自然", tags: ["島","三国","自然","パワースポット","散歩","インスタ","一人","カップル"], desc: "東尋坊のそばに浮かぶ神秘の島。大湊神社が鎮座し、朱塗りの橋と自然林が幻想的。地元民が「神の島」と崇める。", emoji: "🌿", access: "東尋坊から徒歩約15分", url: "https://www.fuku-e.com/spot/detail_1468.html" },
+  { name: "三国湊 北前船主の館 右近家（うこんけ）", area: "坂井市", cat: "歴史", tags: ["歴史","三国","散歩","カップル","インスタ","古い町並み","北前船"], desc: "明治期の北前船主の豪邸を公開。レトロな三国湊の街並み散策の拠点に。近くにカフェや雑貨屋も点在。", emoji: "🏘️", access: "えちぜん鉄道三国駅から徒歩約10分", url: "https://kanko-sakai.com/spot/ukonke/" },
+  { name: "POSSE COFFEE（ポッセコーヒー）", smoking: "禁煙", parking: true, card: true, area: "坂井市", cat: "カフェ", tags: ["カフェ","コーヒー","三国","おしゃれ","インスタ","一人","カップル","スイーツ","プリン"], desc: "三国運動公園前のガラス張りカフェ。自家焙煎ハンドドリップと名物「コーヒー屋さんのプリン」が大人気。", emoji: "☕", access: "えちぜん鉄道三国港駅から徒歩約8分／住所：坂井市三国町運動公園2-18-20", url: "https://www.possecoffee.com/" },
+  { name: "COFFEE IN KIMONO（コーヒーインキモノ）", smoking: "禁煙", parking: false, card: true, area: "坂井市", cat: "カフェ", tags: ["カフェ","コーヒー","三国","おしゃれ","インスタ","カップル","着物","ギャラリー"], desc: "呉服店横にオープンした個性派カフェ。メルボルン仕込みのバリスタ技術と着物ギャラリーが融合した唯一無二の空間。", emoji: "☕", access: "えちぜん鉄道三国駅から徒歩約5分", url: "https://fupo.jp/article/ryukusu_2411/" },
+  { name: "越前松島水族館（えちぜんまつしますいぞくかん）", area: "坂井市", cat: "観光", tags: ["水族館","家族","子ども","カップル","雨","イルカ","癒し","三国"], desc: "イルカ・アシカショーが大人気。タッチ水槽など生き物と触れ合える展示が充実。雨の日のお出かけにもぴったり。", emoji: "🐬", access: "JR芦原温泉駅から京福バス東尋坊方面行きで30分「越前松島水族館」下車すぐ", url: "https://www.echizen-aquarium.com/" },
+  { name: "三国温泉 ゆあぽ～と", area: "坂井市", cat: "温泉", tags: ["温泉","三国","日帰り","のんびり","家族","カップル","サウナ"], desc: "三国の日帰り温泉施設。露天風呂やサウナが充実。東尋坊観光帰りに立ち寄れる便利な温泉スポット。", emoji: "♨️", access: "えちぜん鉄道三国駅から徒歩約15分／住所：坂井市三国町宿2-18-1", url: "http://www.yourport.biz/" },
+
+  // ===== 坂井市・丸岡エリア =====
+  { name: "丸岡城（霞ヶ城）", area: "坂井市", cat: "歴史", tags: ["城","歴史","一人","カップル","桜","春","現存天守","日本100名城","丸岡"], desc: "北陸唯一の現存天守。日本100名城・日本さくら名所100選に選定。春は約400本の桜が咲き誇る。※2025年12月〜2027年11月は耐震工事中（内部見学は可能）。", emoji: "🏯", access: "福井駅から京福バス「丸岡城前行き」約45分「丸岡城前」下車徒歩1分", url: "https://maruoka-castle.jp/" },
+  { name: "丸岡城観光情報センター 丸岡城マチヨリマーケット", area: "坂井市", cat: "ショッピング", tags: ["ショッピング","丸岡","お土産","カフェ","雨","VR","城下町"], desc: "丸岡城のすぐそばの観光施設。VRシアターや福井の名産品が揃う「城下町マルシェ」、丸岡城を眺めながらコーヒーが飲める「ユトリ珈琲店」も入居。", emoji: "🛒", access: "丸岡城と同じアクセス", url: "https://kanko-sakai.com/spot/maruoka-machiyori/" },
+  { name: "一筆啓上茶屋（いっぴつけいじょうちゃや）", area: "坂井市", cat: "グルメ", tags: ["グルメ","そば","丸岡","ランチ","お土産","一人","家族"], desc: "丸岡城下の名物「丸岡在来そば」が食べられる食事処。越前そばの中でも香り高い在来種を使ったそばは格別。", emoji: "🍜", access: "丸岡城から徒歩約1分", url: "http://www.maruoka-kanko.org/" },
+
+  // ===== 坂井市・春江エリア =====
+  { name: "エンゼルランドふくい（福井県児童科学館）", area: "坂井市", cat: "観光", tags: ["家族","子ども","科学館","雨","春江","プラネタリウム","体験"], desc: "プラネタリウムや科学実験が楽しめる児童科学館。子ども連れに大人気。雨の日でも一日遊べる。", emoji: "🚀", access: "えちぜん鉄道太郎丸エンゼルランド駅から徒歩約15分", url: "https://www.angelland.or.jp/" },
+
+  // ===== 福井市エリア =====
+  { name: "一乗谷朝倉氏遺跡（いちじょうだにあさくらしいせき）", area: "福井市", cat: "歴史", tags: ["歴史","遺跡","散歩","一人","カップル","戦国","復元","インスタ","福井市"], desc: "戦国時代の城下町が発掘・復元された国の特別史跡。復原町並では当時の町屋が再現されタイムスリップ感あり！CMロケ地としても話題。", emoji: "🏯", access: "福井駅から京福バス一乗谷線で約30分「一乗谷」下車すぐ", url: "https://www.fuku-e.com/spot/detail_1002.html" },
+  { name: "名勝 養浩館庭園（ようこうかんていえん）", area: "福井市", cat: "歴史", tags: ["庭園","歴史","静か","一人","カップル","紅葉","秋","福井市","散歩"], desc: "江戸時代の福井藩主松平家の別邸。大きな池を中心に書院建築が配置された国の名勝。秋の紅葉と池の組み合わせが絶景。", emoji: "🍂", access: "福井駅から徒歩約10分", url: "https://fuku-iro.jp/spot/detail_10045.html" },
+  { name: "福井城址（ふくいじょうし）", area: "福井市", cat: "歴史", tags: ["城","歴史","散歩","一人","街中","福井市","石垣"], desc: "結城秀康が築いた福井藩の居城跡。現在は県庁が建つ日本で唯一の城址。立派な石垣と堀が残る。", emoji: "🏯", access: "福井駅から徒歩約10分", url: "https://www.fuku-e.com/spot/detail_1016.html" },
+  { name: "福井駅西口広場 恐竜広場", area: "福井市", cat: "観光", tags: ["恐竜","インスタ","福井市","無料","子ども","家族","写真"], desc: "福井駅前に実物大の恐竜が動くモニュメントが並ぶ。無料で楽しめる福井のシンボル的スポット。夜のライトアップも人気。", emoji: "🦕", access: "JR福井駅すぐ", url: "https://www.fuku-e.com/spot/detail_1598.html" },
+  { name: "NIVI SPECIALTY COFFEE（ニビスペシャルティコーヒー）", smoking: "禁煙", parking: false, card: true, area: "福井市", cat: "カフェ", tags: ["カフェ","コーヒー","福井市","スペシャルティ","一人","カップル","おしゃれ"], desc: "新栄商店街にあるスペシャルティコーヒー専門店。その日の気分に合ったコーヒーを店員さんがおすすめしてくれると評判。", emoji: "☕", access: "福井駅から徒歩約10分（新栄商店街内）", url: "https://s.tabelog.com/smartphone/matome/29163/" },
+  { name: "cafe ieme（カフェ イエメ）", smoking: "禁煙", parking: false, card: true, area: "福井市", cat: "カフェ", tags: ["カフェ","コーヒー","福井駅","駅前","一人","テイクアウト","スイーツ"], desc: "福井駅前のスペシャルティコーヒーカフェ。米粉クロワッサンサンドやクロッフルも人気。駅近で立ち寄りやすい。", emoji: "☕", access: "JR福井駅から徒歩約2分", url: "https://fuku-iro.jp/gourmet/detail_12640.html" },
+  { name: "ヨーロッパ軒 総本店（ヨーロッパけん）", smoking: "禁煙", parking: false, card: false, area: "福井市", cat: "グルメ", tags: ["ソースカツ丼","グルメ","ランチ","福井名物","老舗","一人","友達","福井市"], desc: "ソースカツ丼発祥の店。創業100年超の老舗。秘伝の特製ソースとやわらかカツは絶品。週末は行列必至！住所：福井市順化1-7-4", emoji: "🍱", access: "福井駅から徒歩約10分", url: "https://fuku-iro.jp/feature/detail_236.html" },
+
+  // ===== あわら市エリア =====
+  { name: "あわら温泉 まつや千千（まつやちち）", smoking: "分煙", parking: true, card: true, area: "あわら市", cat: "温泉旅館", tags: ["温泉","旅館","あわら","のんびり","カップル","家族","ゆったり","癒し","贅沢"], desc: "20年以上連続「プロが選ぶ日本のホテル・旅館100選」入選の5つ星の宿。北陸最大級500坪の源泉大浴場が自慢。", emoji: "♨️", access: "JR芦原温泉駅から車で約10分（送迎バスあり・要予約）", url: "https://www.matsuyachichi.com/" },
+  { name: "あわら温泉 グランディア芳泉（ほうせん）", smoking: "分煙", parking: true, card: true, area: "あわら市", cat: "温泉旅館", tags: ["温泉","旅館","あわら","カップル","贅沢","露天風呂","のんびり","ゆったり"], desc: "別邸・離れ・露天風呂付き客室など20タイプ揃うあわら温泉の高級旅館。JALファーストクラス機内食監修料理長による会席が絶品。", emoji: "♨️", access: "JR芦原温泉駅から車で約15分（送迎バスあり・要予約）", url: "https://www.grandia.jp/" },
+  { name: "あわら温泉 清風荘（せいふうそう）", smoking: "分煙", parking: true, card: true, area: "あわら市", cat: "温泉旅館", tags: ["温泉","旅館","あわら","のんびり","家族","カップル","露天風呂","炭酸泉"], desc: "4本の自家源泉が注ぐ庭園露天風呂が名物。あわら初の炭酸泉・シルク風呂も。劇場型ビュッフェも評判。", emoji: "♨️", access: "えちぜん鉄道あわら湯のまち駅から徒歩約3分", url: "https://www.seifuso.co.jp/" },
+  { name: "あわら温泉ホテル八木（やぎ）", smoking: "分煙", parking: true, card: true, area: "あわら市", cat: "温泉旅館", tags: ["温泉","旅館","あわら","のんびり","カップル","ゆったり","癒し"], desc: "「気兼ねなく、心地よく」がコンセプトのあわら温泉の人気旅館。じゃらん評価4.5以上の高評価宿。", emoji: "♨️", access: "えちぜん鉄道あわら湯のまち駅から徒歩約5分", url: "https://www.yagi-awara.jp/" },
+  { name: "あわら温泉 美松（みまつ）", smoking: "分煙", parking: true, card: true, area: "あわら市", cat: "温泉旅館", tags: ["温泉","旅館","あわら","カップル","贅沢","露天風呂","のんびり","新幹線"], desc: "北陸新幹線芦原温泉駅から近く便利。全室露天風呂付きブランド「美悠」も人気。日本茶カフェ「茶楽かぐや」も併設。", emoji: "♨️", access: "北陸新幹線・JR芦原温泉駅から車で約10分", url: "https://www.mimatu.net/" },
+  { name: "あわら温泉 ぐらばあ亭（ぐらばあてい）", smoking: "分煙", parking: true, card: true, area: "あわら市", cat: "温泉旅館", tags: ["温泉","旅館","あわら","のんびり","カップル","露天風呂","異国情緒"], desc: "異国情緒あふれる庭園と大滝を眺める露天風呂「天神の湯」が人気。つるつるになるお湯と美食が自慢の宿。", emoji: "♨️", access: "えちぜん鉄道あわら湯のまち駅から徒歩約10分", url: "http://awaraonsengurabatei.jp/" },
+  { name: "あわら温泉グランドホテル", smoking: "分煙", parking: true, card: true, area: "あわら市", cat: "温泉旅館", tags: ["温泉","旅館","あわら","日帰り温泉","家族","ゆったり","七つ湯"], desc: "7つの温泉を巡る「七福湯めぐり」が楽しめる旅館。日帰り温泉・素泊まりプランもあり気軽に利用できる。", emoji: "♨️", access: "えちぜん鉄道あわら湯のまち駅から徒歩約8分", url: "https://awaraonsengrandhotel.jp/" },
+  { name: "芦湯（あしゆ）", area: "あわら市", cat: "温泉", tags: ["足湯","無料","あわら","散歩","のんびり","一人","カップル"], desc: "あわら湯のまち駅すぐそばの無料足湯施設。源泉かけ流しの足湯が5つの浴槽で楽しめる。気軽に温泉気分を味わえる。", emoji: "♨️", access: "えちぜん鉄道あわら湯のまち駅から徒歩約1分（無料）", url: "https://awara.info/" },
+
+  // ===== 永平寺町エリア =====
+  { name: "大本山 永平寺（えいへいじ）", area: "永平寺町", cat: "歴史", tags: ["お寺","歴史","静か","一人","心","パワースポット","禅","修行"], desc: "道元禅師が開いた曹洞宗の大本山。70棟以上の堂宇が建ち並ぶ荘厳な空間。修行僧が今も生活する生きた聖地。", emoji: "⛩️", access: "福井駅から京福バス永平寺行きで約30分「永平寺」下車すぐ", url: "https://www.eiheiji.jp/" },
+
+  // ===== 越前市・鯖江市エリア =====
+  { name: "越前和紙の里 パピルス館", area: "越前市", cat: "体験", tags: ["体験","和紙","工芸","家族","子ども","カップル","雨","ものづくり","越前"], desc: "1500年の歴史を持つ越前和紙の産地。手漉き体験で世界に一つの和紙づくりができる。", emoji: "📄", access: "JR武生駅からバスまたは車で約15分", url: "https://www.echizenwashi.jp/" },
+  { name: "めがねミュージアム", area: "鯖江市", cat: "体験", tags: ["メガネ","体験","ユニーク","カップル","友達","雨","鯖江","ショッピング"], desc: "メガネ生産量日本一の鯖江にある世界唯一のメガネ博物館。職人こだわりのメガネ購入・オリジナル製作体験も！", emoji: "👓", access: "JR鯖江駅から徒歩約10分", url: "https://www.megane.gr.jp/museum/" },
+
+  // ===== 勝山市エリア =====
+  { name: "福井県立恐竜博物館（きょうりゅうはくぶつかん）", area: "勝山市", cat: "恐竜", tags: ["恐竜","家族","子ども","博物館","雨","友達","非日常","勝山"], desc: "世界三大恐竜博物館のひとつ！43体の全身骨格標本が並ぶ迫力の展示。福井が誇る世界レベルの博物館。", emoji: "🦕", access: "JR勝山駅から京福バス恐竜博物館線で約15分「恐竜博物館前」下車すぐ", url: "https://www.dinosaur.pref.fukui.jp/" },
+  { name: "スキージャム勝山", area: "勝山市", cat: "体験", tags: ["スキー","スノボ","冬","アクティブ","友達","カップル","家族","勝山"], desc: "北陸最大級のスキーリゾート。初心者から上級者まで楽しめる多彩なコース。恐竜博物館とセットで訪問も人気。", emoji: "⛷️", access: "JR勝山駅から送迎バスあり（要確認）", url: "https://www.skijam.jp/" },
+
+  // ===== 敦賀市・若狭エリア =====
+  { name: "気比神宮（けひじんぐう）", area: "敦賀市", cat: "歴史", tags: ["神社","パワースポット","歴史","一人","カップル","敦賀","三大鳥居"], desc: "北陸道総鎮守。日本三大木造鳥居のひとつを持つ格式高い神社。境内は広く厳かな雰囲気が漂う。", emoji: "⛩️", access: "JR敦賀駅から徒歩約15分", url: "https://www.kehijingu.jp/" },
+  { name: "三方五湖（みかたごこ）・レインボーライン山頂公園", area: "若狭町", cat: "自然", tags: ["湖","絶景","ドライブ","カップル","のんびり","インスタ","足湯","若狭"], desc: "5つの湖を望む絶景ドライブコース。山頂公園からは三方五湖が一望でき、足湯も楽しめる福井屈指のビュースポット！", emoji: "🌈", access: "JR三方駅から車で約15分（レインボーラインは有料道路）", url: "https://www.rainbow-line.jp/" },
+  // ===== 奥越（大野市）=====
+  { name: "越前大野城（亀山城）", area: "大野市", cat: "歴史", tags: ["城","歴史","天空の城","雲海","インスタ","一人","カップル","大野","秋冬"], desc: "「天空の城」として全国的に有名。秋〜冬の早朝に雲海に浮かぶ姿が絶景。日本三大天空の城のひとつ。亀山公園の桜も名所。", emoji: "🏯", access: "JR越前大野駅から徒歩約25分（亀山登り口まで）", url: "https://www.ono-kankou.jp/tourism/sight/entry-11.html" },
+  { name: "七間朝市（しちけんあさいち）", area: "大野市", cat: "グルメ", tags: ["朝市","グルメ","大野","散歩","地元","野菜","春夏秋"], desc: "400年以上の歴史を持つ朝市。毎日開催（元旦除く）。地元の農家が新鮮な野菜・漬物・手作り品を販売。大野城下の朝の風物詩。", emoji: "🌿", access: "JR越前大野駅から徒歩約5分（七間通り）", url: "https://www.ono-kankou.jp/tourism/eat/entry-33.html" },
+  { name: "越前おおの結ステーション", area: "大野市", cat: "ショッピング", tags: ["お土産","大野","道の駅","ショッピング","大野在来そば","地酒","家族"], desc: "大野市の観光拠点。大野産の特産品・名水仕込みの地酒・大野在来そばなどが揃う。観光情報収集にも便利。", emoji: "🛒", access: "JR越前大野駅から徒歩約5分", url: "https://musubu-station.com/" },
+  { name: "山元醤油味噌醸造元（やまもとしょうゆみそ）", area: "大野市", cat: "体験", tags: ["醤油","味噌","体験","大野","ものづくり","お土産","発酵"], desc: "七間商店街にある創業100年超の老舗醸造元。大野名水で仕込んだ味噌・醤油を販売。醸造の見学・購入ができる。", emoji: "🫙", access: "JR越前大野駅から徒歩約7分", url: "https://www.ono-kankou.jp/tourism/eat/entry-46.html" },
+  { name: "九頭竜湖（くずりゅうこ）", area: "大野市", cat: "自然", tags: ["湖","紅葉","ドライブ","秋","絶景","大野","のんびり","キャンプ"], desc: "秋の紅葉が湖面に映える絶景スポット。日本の紅葉名所100選に選定。道の駅「九頭竜」も併設で休憩にも便利。", emoji: "🍂", access: "JR九頭竜湖駅すぐ（越美北線終点）", url: "https://www.ono-kankou.jp/tourism/sight/entry-4.html" },
+  { name: "荒島岳（あらしまだけ）", area: "大野市", cat: "自然", tags: ["登山","山","百名山","アクティブ","一人","友達","絶景","大野"], desc: "福井唯一の日本百名山。標高1523m。勝原コース・中出コースなど複数の登山道あり。山頂からの白山連峰の眺めが格別。", emoji: "⛰️", access: "JR勝原駅から登山口まで徒歩約20分", url: "https://www.ono-kankou.jp/tourism/sight/entry-1.html" },
+  { name: "越前大野 寺町通り（てらまちどおり）", area: "大野市", cat: "歴史", tags: ["歴史","散歩","寺","大野","城下町","静か","一人","カップル"], desc: "北陸の小京都と呼ばれる大野市の城下町。各宗派の寺院が立ち並ぶ静かな通り。昔ながらの趣を感じられる散策スポット。", emoji: "⛩️", access: "JR越前大野駅から徒歩約10分", url: "https://www.ono-kankou.jp/tourism/sight/entry-14.html" },
+
+  // ===== 丹南（越前市）=====
+  { name: "越前市 武生商店街（たけふしょうてんがい）・蔵の辻（くらのつじ）", area: "越前市", cat: "歴史", tags: ["散歩","歴史","越前","街並み","カップル","インスタ","カフェ"], desc: "「蔵の辻」は古い蔵を活用したおしゃれな観光エリア。カフェやショップが並び、越前市の新旧が交差するスポット。", emoji: "🏘️", access: "ハピラインふくい武生駅から徒歩約10分", url: "https://www.city.echizen.lg.jp/office/070/060/kanko/spot/index.html" },
+  { name: "いわい文化の里（いわいぶんかのさと）", area: "越前市", cat: "歴史", tags: ["歴史","博物館","越前","一人","カップル","雨"], desc: "越前の歴史・文化を展示する複合文化施設。越前市ゆかりの文化財を多数所蔵。越前の歴史を深く知りたい人に。", emoji: "🏛️", access: "ハピラインふくい武生駅から徒歩約15分", url: "https://www.city.echizen.lg.jp/office/070/060/kanko/spot/index.html" },
+  { name: "紫式部公園（むらさきしきぶこうえん）", area: "越前市", cat: "観光", tags: ["公園","歴史","越前","インスタ","春","カップル","桜","源氏物語"], desc: "「源氏物語」の作者・紫式部が若き日を過ごした越前市にある日本庭園。黄金の紫式部像が有名でインスタ映えも抜群。", emoji: "🌸", access: "ハピラインふくい武生駅から徒歩約15分（無料）", url: "https://www.city.echizen.lg.jp/office/070/060/kanko/spot/murasaki.html" },
+  { name: "おろしそば 福留（ふくどめ）", area: "越前市", cat: "グルメ", tags: ["そば","おろしそば","グルメ","越前","ランチ","一人","友達"], desc: "越前市の人気そば屋。コシの強い越前そばと大根おろしの組み合わせが絶品。地元民から観光客まで愛される名店。", emoji: "🍜", access: "ハピラインふくい武生駅から車で約5分", url: "https://www.city.echizen.lg.jp/office/070/060/kanko/gourmet/index.html" },
+  { name: "越前市味真野苑（あじまのえん）", area: "越前市", cat: "自然", tags: ["公園","花","春","越前","チューリップ","家族","カップル","無料"], desc: "春のチューリップまつりで有名な公園。約30万本のチューリップが咲き誇る春は特に圧巻！万葉集ゆかりの地でもある。", emoji: "🌷", access: "ハピラインふくい武生駅からバスで約15分", url: "https://www.city.echizen.lg.jp/office/070/060/kanko/spot/ajimano.html" },
+
+  // ===== 丹南（南越前町・池田町）=====
+  { name: "南越前町 河野海岸（かわのかいがん）", area: "南越前町", cat: "自然", tags: ["海","自然","ドライブ","絶景","南越前","一人","カップル","北前船"], desc: "北前船の船主屋敷が残る歴史ある港町・河野。穏やかな入り江と歴史的建造物が融合した独特の景観が魅力。", emoji: "⚓", access: "JR河野駅から徒歩すぐ", url: "https://www.town.minamiechizen.lg.jp/kanko/" },
+  { name: "池田町 水海の田楽（みずうみのでんがく）", area: "池田町", cat: "歴史", tags: ["伝統","文化","池田","歴史","祭り","体験","冬"], desc: "800年以上続く国の重要無形民俗文化財。毎年2月に行われる日本最古の田楽のひとつ。幻想的な夜の神事は必見。", emoji: "🎭", access: "JR武生駅からバスで約50分", url: "https://www.town.ikeda.fukui.jp/kanko/" },
+
+  // ===== 嶺南（敦賀市）=====
+  { name: "金崎宮（かなさきぐう）", area: "敦賀市", cat: "歴史", tags: ["神社","歴史","パワースポット","敦賀","カップル","桜","縁結び"], desc: "「難関突破」「縁結び」のご利益で有名な神社。春は境内の桜が絶景。敦賀港を一望できる高台に建つ。", emoji: "⛩️", access: "JR敦賀駅から徒歩約20分", url: "https://kanazakigu.com/" },
+  { name: "敦賀赤レンガ倉庫（つるがあかれんがそうこ）", area: "敦賀市", cat: "観光", tags: ["レンガ","インスタ","敦賀","カップル","ショッピング","グルメ","雨"], desc: "明治末期に建てられた赤レンガ倉庫をリノベーション。飲食・物販・イベントスペースが入る敦賀港のシンボル的スポット。", emoji: "🏗️", access: "JR敦賀駅から徒歩約15分", url: "https://tsuruga-akarenga.jp/" },
+  { name: "どんと丼（どんとどん）", smoking: "禁煙", parking: true, card: true, area: "敦賀市", cat: "グルメ", tags: ["海鮮丼","グルメ","敦賀","朝食","ランチ","友達","家族","海鮮"], desc: "敦賀港の魚市場前の海鮮丼専門店。越前若狭の新鮮な海の幸を豪快に盛り付けた丼が名物。朝6時から営業。", emoji: "🍚", access: "JR敦賀駅からバスで約5分（敦賀港周辺）", url: "https://www.turuga.org/places/taberu/dontdon.html" },
+  { name: "水島（みずしま）", area: "敦賀市", cat: "自然", tags: ["海","島","夏","海水浴","インスタ","カップル","シュノーケル","北陸のハワイ"], desc: "「北陸のハワイ」と呼ばれる無人島。透明度抜群の白砂ビーチが広がり、渡し船でアクセス。7月〜8月の海水浴シーズンに人気爆発！", emoji: "🏝️", access: "JR敦賀駅からコミュニティバス「色ヶ浜」下車→渡し船", url: "https://www.turuga.org/places/scenery/mizushima.html" },
+  { name: "敦賀ムゼウム（ムゼウム）", area: "敦賀市", cat: "観光", tags: ["歴史","博物館","敦賀","ユダヤ","感動","一人","カップル","雨"], desc: "敦賀がユダヤ人難民を受け入れた歴史を伝える博物館。「命のビザ」杉原千畝とゆかりの地。世界史的に貴重な史実を学べる。", emoji: "🕍", access: "JR敦賀駅から徒歩約15分", url: "https://www.turuga.org/places/tabiru/museum.html" },
+
+  // ===== 嶺南（小浜市）=====
+  { name: "小浜市 御食国若狭おばま食文化館（みけつくにわかさおばましょくぶんかかん）", area: "小浜市", cat: "体験", tags: ["体験","食文化","小浜","若狭","鯖寿司","家族","グルメ","雨"], desc: "御食国（みけつくに）として朝廷に食材を献上してきた若狭小浜の食文化を体験・学べる施設。鯖寿司・へしこ作り体験が人気。", emoji: "🍱", access: "JR小浜駅から徒歩約8分", url: "https://www.obama-wakasa.com/spot/detail/67/" },
+  { name: "小浜西組重要伝統的建造物群保存地区（こはまにしぐみ）", area: "小浜市", cat: "歴史", tags: ["歴史","街並み","小浜","散歩","インスタ","カップル","重要文化財"], desc: "江戸時代の商家や武家の建物が残る国の重要伝統的建造物群保存地区。「海のある奈良」と呼ばれる小浜の歴史を感じる街歩き。", emoji: "🏘️", access: "JR小浜駅から徒歩約10分", url: "https://www.obama-wakasa.com/spot/detail/52/" },
+  { name: "若狭小浜 丸海 小浜本店（まるうみ）", area: "小浜市", cat: "グルメ", tags: ["お土産","グルメ","小浜","若狭","小鯛ささ漬け","海産物","ショッピング"], desc: "若狭小浜の名産「小鯛のささ漬け」が買える老舗海産物店。若狭湾の厳選海の幸・加工品をお土産に。", emoji: "🐟", access: "JR小浜駅から徒歩約10分", url: "https://www.obama-wakasa.com/" },
+  { name: "神宮寺・鵜の瀬（じんぐうじ・うのせ）", area: "小浜市", cat: "歴史", tags: ["寺","歴史","小浜","パワースポット","奈良","お水送り","春"], desc: "奈良東大寺「お水取り」に先立ち行われる「お水送り」の儀式で有名な神宮寺。毎年3月2日の神事は幻想的な火と水の祭典。", emoji: "⛩️", access: "JR小浜駅からバスで約20分", url: "https://www.obama-wakasa.com/spot/detail/38/" },
+
+  // ===== 嶺南（若狭町・美浜町）=====
+  { name: "瓜割の滝（うりわりのたき）", area: "若狭町", cat: "自然", tags: ["滝","名水","若狭","パワースポット","自然","夏","一人","カップル"], desc: "名水百選に選ばれた清らかな湧水の滝。夏でも瓜が割れるほど冷たい水が有名。天徳寺境内の神聖な空間に湧き出る。", emoji: "💧", access: "JR上中駅から徒歩約15分", url: "https://wakasa-obama.jp/spot/detail/33/" },
+  { name: "美浜町 水晶浜（すいしょうはま）", area: "美浜町", cat: "自然", tags: ["海水浴","海","夏","インスタ","カップル","アクティブ","美浜","透明度"], desc: "透明度の高さが自慢の福井屈指のビーチ。白く輝く砂浜と青い海が美しく「水晶」の名にふさわしい絶景。夏は海水浴客で賑わう。", emoji: "🏖️", access: "JR美浜駅からバスで約15分", url: "https://www.town.mihama.fukui.jp/kankou/" },
+  { name: "三方五湖 縄文博物館（じょうもんはくぶつかん）", area: "若狭町", cat: "観光", tags: ["博物館","縄文","若狭","歴史","家族","雨","体験"], desc: "三方五湖周辺から出土した縄文時代の遺物を展示。「鳥浜貝塚」の発掘品も多数。縄文人の暮らしを身近に感じられる。", emoji: "🏛️", access: "JR三方駅から徒歩約10分", url: "https://www.jomon-museum.jp/" },
+
+  // ===== あわら市・地元の名店 =====
+  { name: "はるの寿司", smoking: "可", parking: true, card: false, area: "あわら市", cat: "グルメ", tags: ["寿司","あわら","グルメ","海鮮","ランチ","カップル","家族","地元","おすすめ"], desc: "あわら市の地元に愛される寿司店。新鮮なネタと丁寧な仕事が光る一軒。温泉旅行の食事にもぴったり。", emoji: "🍣", access: "あわら市内", url: "" },
+  { name: "イロトリドリ", smoking: "可", parking: true, card: true, area: "あわら市", cat: "グルメ", tags: ["焼肉","あわら","グルメ","肉","カップル","友達","家族","地元","おすすめ"], desc: "あわら市の人気焼肉店。色とりどりの肉メニューが楽しめる地元で愛される一軒。", emoji: "🥩", access: "あわら市内", url: "" },
+  { name: "どすこい寿司", smoking: "禁煙", parking: true, card: true, area: "あわら市", cat: "グルメ", tags: ["寿司","あわら","グルメ","海鮮","ランチ","家族","友達","地元","回転寿司"], desc: "あわら市の人気寿司店。ボリューム満点でコスパ抜群。地元民から観光客まで幅広く愛されている。", emoji: "🍣", access: "あわら市内", url: "" },
+
+  // ===== 福井市・地元の名店 =====
+  { name: "鮨凌（すしりょう）", smoking: "禁煙", parking: false, card: true, area: "福井市", cat: "グルメ", tags: ["寿司","福井市","グルメ","海鮮","贅沢","カップル","デート","記念日","おすすめ"], desc: "福井市の実力派寿司店。福井の海の幸を使った本格江戸前寿司が堪能できる。特別な日の食事にぴったり。", emoji: "🍣", access: "福井市内", url: "" },
+  { name: "いちもんめ", smoking: "可", parking: true, card: false, area: "福井市", cat: "グルメ", tags: ["寿司","福井市","グルメ","海鮮","ランチ","カップル","友達","地元","おすすめ"], desc: "福井市の地元民に愛される寿司店。新鮮な地魚を使ったお寿司がリーズナブルに楽しめる人気店。", emoji: "🍣", access: "福井市内", url: "" },
+
+];
+// ===== メインロジック =====
+
+const MOODS = [
+  { emoji: "😴", label: "ゆったりしたい", keys: ["のんびり","癒し","静か","温泉","ゆったり"] },
+  { emoji: "🔥", label: "アクティブに動きたい", keys: ["アクティブ","登山","スキー","体験","スノボ"] },
+  { emoji: "🍣", label: "美味しいもの食べたい", keys: ["グルメ","カニ","そば","海鮮","ランチ"] },
+  { emoji: "☕", label: "カフェでまったり", keys: ["カフェ","コーヒー","スイーツ","のんびり"] },
+  { emoji: "🦕", label: "非日常を味わいたい", keys: ["恐竜","体験","ユニーク","非日常","VR"] },
+  { emoji: "👨‍👩‍👧", label: "子どもと一緒", keys: ["家族","子ども","体験","水族館","科学館"] },
+  { emoji: "💑", label: "デートしたい", keys: ["カップル","絶景","インスタ","おしゃれ","足湯"] },
+  { emoji: "🧘", label: "心を整えたい", keys: ["パワースポット","静か","お寺","神社","禅"] },
+  { emoji: "♨️", label: "温泉でゆっくり", keys: ["温泉","旅館","露天風呂","ゆったり","足湯"] },
+  { emoji: "🛍️", label: "買い物・体験したい", keys: ["ショッピング","体験","買い物","お土産","工芸"] },
+];
+
+const AREAS = ["坂井市","あわら市","福井市","永平寺町","越前市","鯖江市","南越前町","池田町","勝山市","大野市","敦賀市","美浜町","若狭町","小浜市"];
+const TAGS = ["カフェ","温泉旅館","恐竜","東尋坊","永平寺","桜","足湯","無料","雨の日","インスタ"];
+
+const CHAIN_AREAS = ["すべて","福井市","坂井市","あわら市","越前市","鯖江市","勝山市","大野市","敦賀市","小浜市","若狭町","南越前町"];
+const CHAIN_CATS = ["すべて","ファストフード","回転寿司","牛丼・丼","カフェチェーン","ファミレス","ラーメンチェーン","焼肉","スイーツ"];
+
+let currentSmokingFilter = "すべて";
+let currentResults = [];
+let chainArea = "すべて";
+let chainCat = "すべて";
+
+function scoreSpotFn(spot, keys) {
+  let s = 0;
+  keys.forEach(k => {
+    const kl = k.toLowerCase();
+    if (spot.name.toLowerCase().includes(kl)) s += 10;
+    if (spot.area.toLowerCase().includes(kl)) s += 8;
+    if (spot.cat.toLowerCase().includes(kl)) s += 6;
+    spot.tags.forEach(t => { if (t.includes(kl) || kl.includes(t)) s += 3; });
+    if (spot.desc.includes(k)) s += 2;
+  });
+  return s;
+}
+
+function searchSpots(query) {
+  const keys = query.trim().split(/[\s\u3000]+/);
+  return SPOTS.map(s => ({ ...s, _score: scoreSpotFn(s, keys) }))
+    .filter(s => s._score > 0).sort((a, b) => b._score - a._score).slice(0, 6);
+}
+
+function searchByKeysFn(keys) {
+  return SPOTS.map(s => ({ ...s, _score: scoreSpotFn(s, keys) }))
+    .filter(s => s._score > 0).sort((a, b) => b._score - a._score).slice(0, 6);
+}
+
+function showMood(i) {
+  const m = MOODS[i];
+  showResults(m.label, searchByKeysFn(m.keys));
+}
+
+function showResults(label, found) {
+  currentResults = found;
+  currentSmokingFilter = "すべて";
+  document.getElementById("result-title").textContent = label;
+  document.getElementById("page-top").style.display = "none";
+  document.getElementById("page-results").style.display = "flex";
+  renderSmokingRow();
+  renderCards();
+}
+
+function goBack() {
+  document.getElementById("page-top").style.display = "flex";
+  document.getElementById("page-results").style.display = "none";
+}
+
+function renderSmokingRow() {
+  const row = document.getElementById("smoking-row");
+  row.innerHTML = ["すべて","可","分煙","禁煙"].map(v => {
+    const label = v === "すべて" ? "🍽️ すべて" : v === "可" ? "🚬 喫煙可" : v === "分煙" ? "🚬 分煙" : "🚭 禁煙";
+    return `<button class="smoking-btn${currentSmokingFilter===v?' active':''}" onclick="setSmokingFilter('${v}')">${label}</button>`;
+  }).join("");
+}
+
+function setSmokingFilter(v) {
+  currentSmokingFilter = v;
+  renderSmokingRow();
+  renderCards();
+}
+
+function renderCards() {
+  const filtered = currentResults.filter(r => currentSmokingFilter === "すべて" || r.smoking === currentSmokingFilter);
+  document.getElementById("result-count").textContent = filtered.length + "件見つかったよ！";
+
+  if (filtered.length === 0) {
+    document.getElementById("card-list").innerHTML = `<div class="no-result"><div style="font-size:40px">🦕</div><div>ごめん、ぴったりのスポットが見つからんかった！<br>別のキーワードで試してみてね。</div></div>`;
+    return;
+  }
+
+  document.getElementById("card-list").innerHTML = filtered.map(spot => {
+    const smokingBadge = spot.smoking ? `<span class="info-badge ${spot.smoking==='可'?'badge-smoke':spot.smoking==='分煙'?'badge-bunnen':''}">${spot.smoking==='可'?'🚬 喫煙可':spot.smoking==='分煙'?'🚬 分煙':'🚭 禁煙'}</span>` : '';
+    const parkingBadge = spot.parking !== undefined ? `<span class="info-badge">${spot.parking?'🅿️ 駐車場あり':'🅿️ 駐車場なし'}</span>` : '';
+    const cardBadge = spot.card !== undefined ? `<span class="info-badge">${spot.card?'💳 カード可':'💳 現金のみ'}</span>` : '';
+    const infoBadges = (smokingBadge || parkingBadge || cardBadge) ? `<div class="info-row">${smokingBadge}${parkingBadge}${cardBadge}</div>` : '';
+    const accessHtml = spot.access ? `<div class="access-box">🚃 ${spot.access}</div>` : '';
+    const urlBtn = spot.url ? `<a href="${spot.url}" target="_blank" class="site-btn">🔗 公式</a>` : '';
+    return `<div class="card">
+      <div class="card-top">
+        <span class="card-emoji">${spot.emoji}</span>
+        <div>
+          <div class="card-name">${spot.name}</div>
+          <div class="card-meta">📍${spot.area}　<span class="cat-badge">${spot.cat}</span></div>
+        </div>
+      </div>
+      <div class="card-desc">${spot.desc}</div>
+      ${accessHtml}
+      ${infoBadges}
+      <div class="card-bottom">
+        <div class="card-tags">${spot.tags.slice(0,4).map(t=>`<span class="card-tag">#${t}</span>`).join('')}</div>
+        <div class="btn-row">
+          <a href="https://www.google.com/maps/search/${encodeURIComponent(spot.name+' '+spot.area)}" target="_blank" class="map-btn">🗺️ マップ</a>
+          ${urlBtn}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function doSearch() {
+  const q = document.getElementById("search-input").value.trim();
+  if (!q) return;
+  showResults(`「${q}」の検索結果`, searchSpots(q));
+}
+
+function renderChains() {
+  document.getElementById("chain-total").textContent = `福井県内 ${CHAINS.length}店舗収録`;
+
+  document.getElementById("chain-area-row").innerHTML = CHAIN_AREAS.map(a =>
+    `<button class="chain-btn${chainArea===a?' active':''}" onclick="setChainArea('${a}')">${a}</button>`
+  ).join("");
+
+  document.getElementById("chain-cat-row").innerHTML = CHAIN_CATS.map(c =>
+    `<button class="chain-btn${chainCat===c?' active':''}" onclick="setChainCat('${c}')">${c}</button>`
+  ).join("");
+
+  const filtered = CHAINS.filter(c =>
+    (chainArea === "すべて" || c.area === chainArea) &&
+    (chainCat === "すべて" || c.cat === chainCat)
+  );
+  document.getElementById("chain-count").textContent = filtered.length + "件";
+  document.getElementById("chain-grid").innerHTML = filtered.map(c =>
+    `<a href="https://www.google.com/maps/search/${encodeURIComponent(c.name+' '+c.addr)}" target="_blank" class="chain-card">
+      <span style="font-size:18px">${c.emoji}</span>
+      <div style="flex:1;min-width:0">
+        <div class="chain-name">${c.name}</div>
+        <div class="chain-addr">📍${c.addr}</div>
+      </div>
+      <span>🗺️</span>
+    </a>`
+  ).join("");
+}
+
+function setChainArea(a) { chainArea = a; renderChains(); }
+function setChainCat(c) { chainCat = c; renderChains(); }
+
+function toggleMascot() {
+  const b = document.getElementById("mascot-balloon");
+  const lines = ["福井においでよ！最高やよ〜！","越前ガニ、食べたことある？","恐竜博物館、ぜったい行ってや！","東尋坊の夕日、最高やよ！","あわら温泉、ゆっくりしてきてね♪","永平寺で心を整えよう！"];
+  if (b.classList.contains("hidden")) {
+    b.innerHTML = lines[Math.floor(Math.random()*lines.length)];
+    b.classList.remove("hidden");
+  } else {
+    b.classList.add("hidden");
+  }
+}
+
+// 初期描画
+document.getElementById("mood-grid").innerHTML = MOODS.map((m, i) =>
+  `<button class="mood-btn" onclick="showMood(${i})">
+    <span class="mood-emoji">${m.emoji}</span>
+    <span class="mood-text">${m.label}</span>
+  </button>`
+).join("");
+
+document.getElementById("area-grid").innerHTML = AREAS.map(a =>
+  `<button class="area-btn" onclick="showResults('${a}のスポット', searchSpots('${a}'))">${a}</button>`
+).join("");
+
+document.getElementById("tag-row").innerHTML = TAGS.map(t =>
+  `<button class="tag" onclick="document.getElementById('search-input').value='${t}';showResults('「${t}」の検索結果', searchSpots('${t}'))">${t}</button>`
+).join("");
+
+renderChains();
+</script>
+</body>
+</html>
